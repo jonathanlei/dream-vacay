@@ -29,6 +29,10 @@ toolbar = DebugToolbarExtension(app)
 """ routes
 "/"
 "/topairbnbs"
+"/explore"
+
+"/flights"
+"budget"
 """
 
 @app.route("/")

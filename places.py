@@ -32,6 +32,7 @@ UPSPLASH_URL = "https://unsplash.com/s/photos"
 
 
 def get_image(name):
+    
     url = UPSPLASH_URL + f"/{name}"
     PARAMS = {'auth_key': auth_key, 'url': url}
     r = requests.get(url=URL, params=PARAMS)
