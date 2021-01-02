@@ -1,6 +1,8 @@
 """ get 50 most popular places traveled in the world into a database"""
 import requests
 from bs4 import BeautifulSoup
+import csv
+
 
 URL = "http://api.proxiesapi.com"
 auth_key = "60209c48efa989433e3f5c3924734a9c_sr98766_ooPq87"
@@ -32,7 +34,7 @@ UPSPLASH_URL = "https://unsplash.com/s/photos"
 
 
 def get_image(name):
-    
+
     url = UPSPLASH_URL + f"/{name}"
     PARAMS = {'auth_key': auth_key, 'url': url}
     r = requests.get(url=URL, params=PARAMS)
@@ -48,3 +50,8 @@ def get_image(name):
 barbabos_img_url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuNEO1C66cCUvV2jENG8tCKK89rXOGpbY_vA&usqp=CAU"
 place_img_list = {place: get_image(place) for place in place_list}
 place_img_list["Barbabos"] = barbabos_img_url
+
+
+with open('/static/csvs/place_img.csv', 'w') as f:
+    for key in place_img_list.keys():
+        f.write("%s,%s\n"%(key,my_dict[key]))
