@@ -2,7 +2,53 @@
 
 
 {% block content%}
+<body>
+    <div class="container"> 
+        <div class="row"> 
+            
+                
+    {% for place in places %}
+    <div class="col-lg-4 col-md-6 col-12">
+    <div class="card m-sm-4" style="width: 350px;" id="{{place['place']}}">
+        <div>
+            <img src="{{place['img_url']}}" class="card-img-top" alt="{{place['place']}}">
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{place['place'].replace("--",",").replace("-", " ")}}</h5>
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    {% for field in form
+                        if field.widget.input_type != "hidden" %}
+                        
+                        <p>
+                            {{ field.label }}
+                            {{ field }}
+                            
+                            {% for error in field.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </p>
+                        
+                        {% endfor %}
+                    </div>
+                    <button class=" btn btn-info btn-sm">Plan My Trip!</button>
+                </form>
+        
+            </div>
+    </div>
+    {% endfor %}
+        
+    </div>
+        </div>
+            </div>
+                
 
-
-
+    </body>
 {% endblock %}
+
+
+
+
+
+
+

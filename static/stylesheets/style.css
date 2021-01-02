@@ -8,8 +8,18 @@ img {
 .btn-link {
     font-family: 'Libre Baskerville', serif;
 }
+.card-title{
+    font-family: 'Libre Baskerville', serif;
+}
+label {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 14px;
+}
+.btn-info{
+    font-family: 'Libre Baskerville', serif;
+}
 
-body {
+#home-page {
   background: url("/static/images/travel-background.jpg") no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;

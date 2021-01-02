@@ -3,10 +3,10 @@ import os
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
+import csv
+from forms import SearchForm
 
 
-# from forms import UserAddForm, LoginForm, LogoutForm, MessageForm, UserEditForm, LikeForm
-# from models import db, connect_db, User, Message, Like
 
 CURR_USER_KEY = "curr_user"
 
@@ -37,8 +37,14 @@ toolbar = DebugToolbarExtension(app)
 
 @app.route("/")
 def show_home():
+    """ show homepage  """
     return render_template("home.html")
 
 @app.route("/explore")
 def show_explore():
-    return render_template("explore.html")
+    """ show explore page """
+    with open('static/csvs/places.csv') as f:
+        places = [{k: v for k, v in row.items()}
+                  for row in csv.DictReader(f, skipinitialspace=True)]
+    form = SearchForm()
+    return render_template("explore.html", places=places, form=form)
