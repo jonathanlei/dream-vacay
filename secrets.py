@@ -1,0 +1,3 @@
+""" SHHHHH """
+
+X_RAPIDAPI_KEY = "4790cac1fbmshf2d5db693d2b686p17866djsnc195142818e6"
