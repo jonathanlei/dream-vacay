@@ -1,4 +1,5 @@
-from datetime import datetime 
+from datetime import datetime
+import itertools
 
 
 class Lodging():
@@ -9,11 +10,17 @@ class Lodging():
         self.room_type = room_type
         self.description = description
         self.total_price = total_price
+    
+    @classmethod
+    def fromdict(cls, d):
+        allowed = ("img_url", "rating", "room_type", "description", "total_price")
+        df = {k: v for k, v in d.items() if k in allowed}
+        return cls(**df)
 
 
 class Lodgings_List():
     """ list of lodgings """
-    def __init__(self, location, checkin, checkout, adults, lodgings):
+    def __init__(self, location, checkin, checkout, adults):
         self.location = location
         self.checkin = checkin
         self.checkout = checkout
@@ -24,6 +31,11 @@ class Lodgings_List():
     def add_lodging(self, lodging):
         self.lodgings.append(lodging)
 
+    @classmethod
+    def fromdict(cls, d):
+        allowed = ("location", "checkin", "checkout", "adults")
+        df = {k: v for k, v in d.items() if k in allowed}
+        return cls(**df)
 
 
 

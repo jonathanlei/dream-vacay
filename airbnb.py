@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from models import Lodgings_List, Lodging
+import itertools
 
 
 test_input = {"location": "Houston--TX--United-States",
@@ -37,7 +38,7 @@ def get_single_listing_info(itemlist):
     # total price
     total_text = div_section.findChildren("button")[-1].text
     total_index = total_text.index("total")
-    listing_info["total"] = total_text[:total_index+5].replace(u"\xa0", "")
+    listing_info["total_price"] = total_text[:total_index-1].replace(u"\xa0", "")
 
     # room type
     listing_info["room_type"] = div_section.findChild("div", string=re.compile(" in ")).text
@@ -45,15 +46,15 @@ def get_single_listing_info(itemlist):
     # description
     listing_info["description"] = div_section.findChild("img")["alt"]
 
-    return listing_info
+    return Lodging.fromdict(listing_info)
 
 
 def get_listings_info(search_input):
     """ given a airbnb url, scrape the page and return a list of listings div"""
     # add default params to the inputs
-    test_input["source"] = "structured_search_input_header"
-    test_input["search_type"] = "unknown"
-    test_input["tab_id"] = "home_tab"
+    search_input["source"] = "structured_search_input_header"
+    search_input["search_type"] = "unknown"
+    search_input["tab_id"] = "home_tab"
 
     r = requests.get(url=AIRBNB_URL, params=search_input)
 
@@ -61,8 +62,9 @@ def get_listings_info(search_input):
 
     itemlist = soup.find_all(itemprop="itemListElement")
 
-    lodgins_list = Lodgings_List(**search_input)
+    lodgings_list = Lodgings_List.fromdict(search_input)
+    
+    for listing in itemlist:
+        lodgings_list.add_lodging(get_single_listing_info(listing))
 
-    listings_info = [get_single_listing_info(listing) for listing in itemlist]
-
-    return listings_info
+    return lodgings_list
