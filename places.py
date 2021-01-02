@@ -52,6 +52,6 @@ place_img_list = {place: get_image(place) for place in place_list}
 place_img_list["Barbabos"] = barbabos_img_url
 
 
-with open('/static/csvs/place_img.csv', 'w') as f:
+with open('test.csv', 'w') as f:
     for key in place_img_list.keys():
-        f.write("%s,%s\n"%(key,my_dict[key]))
+        f.write("%s,%s\n" % (key, place_img_list[key]))

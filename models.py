@@ -1,3 +1,33 @@
+from datetime import datetime 
+
+
+class Lodging():
+    """ single lodging """
+    def __init__(self, lodgings, img_url, rating, room_type, description, total_price):
+        self.lodgings = lodgings
+        self.img_url = img_url
+        self.rating = rating
+        self.room_type = room_type
+        self.description = description
+        self.total_price = total_price
+
+
+class LodgingsList():
+    """ list of lodgings """
+    def __init__(self, location, checkin, checkout, adults, lodgings):
+        self.location = location
+        self.checkin = checkin
+        self.checkout = checkout
+        self.adults = adults
+        self.searchTime = datetime.utcnow()
+        self.lodgings = []
+    
+
+    
+
+
+
+
 # trips class 
 # dates
 # destination 

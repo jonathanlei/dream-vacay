@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from places import place_list, place_img_list
+
 
 # from forms import UserAddForm, LoginForm, LogoutForm, MessageForm, UserEditForm, LikeForm
 # from models import db, connect_db, User, Message, Like
