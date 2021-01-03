@@ -4,6 +4,10 @@
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 import re
 from time import sleep
 from random import randint
@@ -39,6 +43,8 @@ def get_single_flight_info(flight_ticket_container):
     """ Given a flight info container, scrape individual sections and return a flight info instance """
     flight_info = {}
 
+    breakpoint()
+
 
 
 
@@ -52,13 +58,24 @@ def get_flights_list_info(search_inputs):
                            {search_inputs['outbound_date']}/{search_inputs['inbound_date']}/{search_inputs['adults']}adults'"""
     # print(req.content)
     driver = webdriver.Chrome(executable_path='./chromedriver')
-    sleep(5)
 
     # Brute forcing a URL here because need to enable JS or else have to use Selenium
     # and you have to provide URL to driver for Selenium
+    # Sleeping for randint seconds so Kayak doesn't trigger recapcha
     driver.get(FLIGHTS_INFO_URL)
     sleep(randint(4, 10))
-    html = driver.page_source
+
+    # Waiting until page fully loads, tags for best / cheapest flights are in right places
+    # Using the loading indicator for a particular element on site as the bottleneck
+    try:
+        wait = WebDriverWait(driver, 10)
+        wait.until_not(
+            EC.text_to_be_present_in_element((By.ID, re.compile("-advice")), "Loading...")
+        )
+    finally:
+        html = driver.page_source
+        driver.quit()
+
 
     soup = BeautifulSoup(html, features="html.parser")
 
@@ -66,7 +83,30 @@ def get_flights_list_info(search_inputs):
     flight_ticket_containers = soup.find_all("div", { 
                                 "class": "resultInner"
                                 })
-    return flight_ticket_containers
+
+    for ticket_container in filter_quality_flights(flight_ticket_containers):
+        flights_list.add_flight(get_single_flight_info(ticket_container))
+
+    return flights_list
+
+def is_quality_flight(flight_container):
+    """ Filter comparator function to check if flight is good. May need to add another 
+    tag for eco-friendly later """
+
+    cheapest = flight_container.findChild("div", {"class": "bf-cheapest"})
+    best = flight_container.findChild("div", {"class": "bf-best"})
+    if cheapest or best:
+        return True
+    return False
+
+
+def filter_quality_flights(flight_ticket_containers):
+    """ Takes flight infos based on cheapest, best, and eco-friendly tag """
+
+    return list(filter(is_quality_flight, flight_ticket_containers))
+
+
+
         
 
 

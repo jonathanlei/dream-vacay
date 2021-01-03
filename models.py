@@ -60,7 +60,7 @@ class Flight():
                  connections,
                  duration,
                  ):
-        self.airlines = []
+        self.airlines = airlines
         self.airport_origin = airport_origin
         self.airport_destination = airport_destination
         self.price = None
