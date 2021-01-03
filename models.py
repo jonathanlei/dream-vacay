@@ -41,12 +41,11 @@ class Lodgings_List():
 
 class RoundTripFlights():
     """ Round trip flights"""
-    def __init__(self, total_price):
+    def __init__(self, total_price, origin_flight, return_flight):
         self.flights = []
         self.total_price = total_price
- 
-    def add_flight(self, flight):
-        self.flights.append(flight)
+        self.origin_flight = origin_flight
+        self.return_flight = return_flight
 
 
 class Flight():

@@ -38,7 +38,7 @@ FLIGHTS_INFO_URL = f'{KAYAK_URL}/{airport_origin}-{airport_destination}/{outboun
 def get_single_flight_info(flight_ticket_container):
     """ Given a flight info container, scrape individual sections and return a flight info instance """
     flight_info = {}
-    
+
 
 
 
@@ -60,7 +60,7 @@ def get_flights_list_info(search_inputs):
     sleep(randint(4, 10))
     html = driver.page_source
 
-    soup = BeautifulSoup(html,features="html.parser")
+    soup = BeautifulSoup(html, features="html.parser")
 
     flights_list = Flights_List.fromdict(search_inputs)
     flight_ticket_containers = soup.find_all("div", { 
