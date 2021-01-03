@@ -7,11 +7,11 @@ from wtforms.validators import InputRequired, Email, Length, Optional, URL
 class SearchForm(FlaskForm):
     """ forms for searching for a trip"""
 
-    origin = StringField("from", validators=[InputRequired(),
+    origin = StringField("From", validators=[InputRequired(),
                                              Length(min=2, max=30)])
-    checkin = DateField("check in date", validators=[InputRequired()])
-    checkout = DateField("check out date", validators=[InputRequired()])
-    adults = IntegerField("number of guests",
+    checkin = DateField("Check in date", validators=[InputRequired()])
+    checkout = DateField("Check out date", validators=[InputRequired()])
+    adults = IntegerField("Number of guests",
                           validators=[InputRequired(), Length(min=1, max=10)])
     
 

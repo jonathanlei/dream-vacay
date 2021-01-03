@@ -1,4 +1,5 @@
 import os
+import json
 
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
@@ -43,8 +44,23 @@ def show_home():
 @app.route("/explore")
 def show_explore():
     """ show explore page """
+    # create lists of places dictionary
     with open('static/csvs/places.csv') as f:
         places = [{k: v for k, v in row.items()}
                   for row in csv.DictReader(f, skipinitialspace=True)]
+
+    with open('static/csvs/worldcities.csv') as f:
+        worldcities = []
+        for row in csv.DictReader(f, skipinitialspace=True):
+            city_country = ""
+            for k, v in row.items():
+                if k == "name":
+                    city_country += v
+                if k == "country":
+                    city_country += f", {v}"
+            worldcities.append(city_country)
     form = SearchForm()
-    return render_template("explore.html", places=places, form=form)
+    return render_template("explore.html",
+                           places=places,
+                           form=form,
+                           worldcities=json.dumps(worldcities))

@@ -1,25 +1,35 @@
 {% extends "base.html" %}
 
-
 {% block content%}
 <body>
     <div class="container"> 
         <div class="row"> 
             
-                
+            <script type="text/javascript">
+                function test_func(data) {
+                    return data
+                }
+                worldcities = test_func({{ worldcities|safe }})
+            </script>
     {% for place in places %}
     <div class="col-lg-4 col-md-6 col-12">
-    <div class="card m-sm-4" style="width: 350px;" id="{{place['place']}}">
+    <div class="card " style="width: 350px;" id="{{place['place']}}">
         <div>
-            <img src="{{place['img_url']}}" class="card-img-top" alt="{{place['place']}}">
+            <img src="{{place['image_url']}}" class="card-img-top img-fluid" alt="{{place['place']}}">
         </div>
         <div class="card-body">
             <h5 class="card-title">{{place['place'].replace("--",",").replace("-", " ")}}</h5>
-                <form method="POST">
+                <form method="POST" autocomplete="off">
                     {{ form.csrf_token }}
+                    <div class='input-group'>
+                        <label for="orign">From &nbsp; </label> 
+                        <input class='form-control autocomplete' type='text' name='origin'>
+                        <br>
+                        <br>
+                    </div>
                     {% for field in form
-                        if field.widget.input_type != "hidden" %}
-                        
+                        if field.widget.input_type != "hidden" and field.name!="origin" %}
+
                         <p>
                             {{ field.label }}
                             {{ field }}

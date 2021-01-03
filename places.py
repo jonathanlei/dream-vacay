@@ -41,9 +41,8 @@ def get_image(name):
     soup = BeautifulSoup(r.content, 'html.parser')
     img_div = soup.find("img", {"class": "_2UpQX"})
     try:
-        img_url = img_div["srcset"].split(" ")[-2]
-        query_index = img_url.index("?")
-        img_url = img_url[:query_index+1]
+        idx = img_div["srcset"].split(" ").index('500w,')
+        img_url = img_div["srcset"].split(" ")[idx-1]
         return img_url
     except TypeError: 
         print(img_div, url)
