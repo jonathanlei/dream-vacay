@@ -13,5 +13,4 @@ class SearchForm(FlaskForm):
     checkout = DateField("Check out date", validators=[InputRequired()])
     adults = IntegerField("Number of guests",
                           validators=[InputRequired(), Length(min=1, max=10)])
-    
 

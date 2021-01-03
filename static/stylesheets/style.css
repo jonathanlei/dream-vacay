@@ -26,8 +26,9 @@ label {
     object-fit: cover;
 }
 .card {
-    margin: auto;
     margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px
 }
 #home-page {
   background: url("/static/images/travel-background.jpg") no-repeat center center fixed; 

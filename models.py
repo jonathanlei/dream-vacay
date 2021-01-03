@@ -39,6 +39,16 @@ class Lodgings_List():
 
 # Flight data classes
 
+class RoundTripFlights():
+    """ Round trip flights"""
+    def __init__(self, total_price):
+        self.flights = []
+        self.total_price = total_price
+ 
+    def add_flight(self, flight):
+        self.flights.append(flight)
+
+
 class Flight():
     """ single flight """
     def __init__(
@@ -46,7 +56,6 @@ class Flight():
                  airlines,
                  airport_origin,
                  airport_destination,
-                 price,
                  takeoff_time,
                  landing_time,
                  connections,
@@ -55,12 +64,12 @@ class Flight():
         self.airlines = []
         self.airport_origin = airport_origin
         self.airport_destination = airport_destination
-        self.price = price
+        self.price = None
         self.takeoff_time = takeoff_time
         self.landing_time = landing_time
         self.connections = int(connections)
         self.duration = duration
-
+    
     @classmethod
     def fromdict(cls, d):
         allowed = (
@@ -81,14 +90,14 @@ class Flights_List():
     """ list of flights """
     def __init__(
                  self,
-                 city_origin,
-                 city_destination,
+                 airport_origin,
+                 airport_destination,
                  outbound_date,
                  inbound_date,
                  adults,
                  ):
-        self.city_origin = city_origin
-        self.city_destination = city_destination
+        self.airport_origin = airport_origin
+        self.airport_destination = airport_destination
         self.outbound_date = outbound_date
         self.inbound_date = inbound_date
         self.adults = adults
@@ -101,8 +110,8 @@ class Flights_List():
     @classmethod
     def fromdict(cls, d):
         allowed = (
-                   "city_origin",
-                   "city_destination",
+                   "airport_origin",
+                   "airport_destination",
                    "outbound_date",
                    "inbound_date",
                    "adults",
