@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 
 import re
 from time import sleep
@@ -21,11 +22,16 @@ airport_destination = "JFK"
 outbound_date = "2021-01-07"  # YYYY-MM-DD
 inbound_date = "2021-01-14"  # YYYY-MM-DD
 
+# Changed airport origin / destination to actual city names to reflect form inputs on explore page
 test_dict = {"adults": 1,
-             "airport_origin": "SFO",
-             "airport_destination": "JFK",
+             "airport_origin": "San Francisco, United States",
+             "airport_destination": "New York City, United States",
              "outbound_date": "2021-01-07",
-             "inbound_date": "2021-01-14"}
+             "inbound_date": "2021-01-14",
+            }   
+            #  "airport_origin_code": None,
+            #  "airport_destination_code": None
+            
 
 # default params in query string for each search
 QUERY_PARAM_INPUTS = {
@@ -105,9 +111,13 @@ def get_flights_list_info(search_inputs):
     """ Given a kayak.com flights info url, scrape page and 
     return a list of flight info """
 
+    # First populate the correct airport codes (using Selenium to validate airport codes from user city inputs)
+    # but may refactor to use database later to map cities to airports?
+    get_city_codes_from(search_inputs)
+
     # req = requests.get(url=FLIGHTS_INFO_URL, params=search_inputs)
     # soup = BeautifulSoup(req.content, 'html.parser')
-    FLIGHTS_INFO_URL = f"""{KAYAK_URL}/{search_inputs['airport_origin']}-{search_inputs['airport_destination']}/
+    FLIGHTS_INFO_URL = f"""{KAYAK_URL}/{search_inputs['origin_airport_code']}-{search_inputs['destination_airport_code']}/
                            {search_inputs['outbound_date']}/{search_inputs['inbound_date']}/{search_inputs['adults']}adults'"""
     # print(req.content)
     driver = webdriver.Chrome(executable_path='./chromedriver')
@@ -127,8 +137,7 @@ def get_flights_list_info(search_inputs):
         )
     finally:
         html = driver.page_source
-        # driver.quit()
-
+        driver.quit()
 
     soup = BeautifulSoup(html, features="html.parser")
 
@@ -151,7 +160,7 @@ def get_flights_list_info(search_inputs):
         """ Takes flight infos based on cheapest, best, and eco-friendly tag """
 
         return list(filter(is_quality_flight, flight_ticket_containers))
-        
+
     for ticket_container in filter_quality_flights(flight_ticket_containers):
         flights_list.add_flight(get_round_trip_flight_info(ticket_container))
 
@@ -159,6 +168,44 @@ def get_flights_list_info(search_inputs):
 
         
 
+def get_city_codes_from(search_input):
+    """ Gets the city codes from user input for cities on explore page  
+    Got help from medium post regarding selecting the correct element to change input text
+    https://medium.com/analytics-vidhya/what-if-selenium-could-do-a-better-job-than-your-travel-agency-5e4e74de08b0
+    """
+
+    driver = webdriver.Chrome(executable_path='./chromedriver')
+
+    # Sleeping for randint seconds so Kayak doesn't trigger recapcha
+    driver.get(KAYAK_URL)
+    sleep(randint(2, 5))
+
+    # Origin click path
+    origin_click_path = "//*[contains(@id, 'origin-airport-display')]"
+    driver.find_element_by_xpath(origin_click_path).click()
+
+    # Origin input box
+    origin_text_path = "//input[contains(@id, 'origin-airport')]"
+    driver.find_element_by_xpath(origin_text_path).send_keys(Keys.BACKSPACE + Keys.BACKSPACE + search_input["airport_origin"])
+    sleep(randint(1, 2))
+    driver.find_element_by_xpath(origin_text_path).send_keys(Keys.RETURN)
+
+    sleep(randint(1, 2))
+
+    # Destination click path
+    destination_click_path = "//*[contains(@id, 'destination-airport-display')]"
+    driver.find_element_by_xpath(destination_click_path).click()
+    
+    # Destination input box
+    destination_text_path = "//input[contains(@id, 'destination-airport')]"
+    driver.find_element_by_xpath(destination_text_path).send_keys(Keys.BACKSPACE + Keys.BACKSPACE + search_input["airport_destination"])
+    sleep(randint(1, 2))
+    driver.find_element_by_xpath(destination_text_path).send_keys(Keys.RETURN)
+
+    search_input["origin_airport_code"] = driver.find_element_by_xpath(origin_click_path).text[-4:-1]
+    search_input["destination_airport_code"] = driver.find_element_by_xpath(destination_click_path).text[-4:-1]
+
+    driver.quit()
 
 
 

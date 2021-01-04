@@ -36,6 +36,7 @@ def get_single_listing_info(itemlist):
         # no rating, add as None
         listing_info["rating"] = None
     # total price
+    breakpoint()
     total_text = div_section.findChildren("button")[-1].text
     total_index = total_text.index("total")
     listing_info["total_price"] = total_text[:total_index-1].replace(u"\xa0", "")
