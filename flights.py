@@ -151,6 +151,7 @@ def get_flights_list_info(search_inputs):
         """ Takes flight infos based on cheapest, best, and eco-friendly tag """
 
         return list(filter(is_quality_flight, flight_ticket_containers))
+        
     for ticket_container in filter_quality_flights(flight_ticket_containers):
         flights_list.add_flight(get_round_trip_flight_info(ticket_container))
 

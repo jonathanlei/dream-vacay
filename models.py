@@ -52,7 +52,7 @@ class RoundTripFlights():
                     Total Price : {self.total_price}
                     Origin Flight : {self.origin_flight.__repr__()}
                     Return Flight : {self.return_flight.__repr__()}
-                    Statuses : {self.statuses}>"""
+                    Statuses : {self.statuses}>\n"""
 
 
 class Flight():
@@ -104,7 +104,11 @@ class Flight():
 
   
 class Flights_List():
-    """ list of flights """
+    """ list of flights 
+    TODO: Consider changing to city_origin and city_destination becuase each flight
+    already contains info about airports but the Flights_List will be based on a single
+    query from one city to another
+    """
     def __init__(
                  self,
                  airport_origin,
@@ -120,6 +124,18 @@ class Flights_List():
         self.adults = adults
         self.searchTime = datetime.utcnow()
         self.flights = []
+    
+    def __repr__(self):
+        """ Readable representation String for list of RoundTripFlights """
+
+        return f""" <Flights List
+            Airport Origin: {self.airport_origin}
+            Airport Destination: {self.airport_destination}
+            Outbound Date: {self.outbound_date}
+            Inbound Date: {self.inbound_date}
+            Adults: {self.adults}
+            Search Time: {self.searchTime}
+            Flights: {self.flights}>"""
 
     def add_flight(self, flight):
         self.flights.append(flight)
