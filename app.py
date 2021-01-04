@@ -83,9 +83,9 @@ def show_trips_result(city_origin, city_destination):
                     "adults": request.args.get("adults"),
                     "checkin": request.args.get("checkin"),
                     "checkout": request.args.get("checkout")}
-    flights = get_flights_list_info(search_input)
-    lodgings = get_listings_info(search_input)
-    return render_template("results.html", lodgings=lodgings, flights=flights)
+    flights_list = get_flights_list_info(search_input)
+    lodgings_list = get_listings_info(search_input)
+    return render_template("results.html", lodgings_list=lodgings_list, flights_list=flights_list)
 
 
 def construct_search_url(base_url, form):

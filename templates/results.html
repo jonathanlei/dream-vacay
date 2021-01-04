@@ -3,28 +3,117 @@
 
 {% block content%}
 <body>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h6 class="display-4">Lodgings</h6>
+            <p>Details: {{lodgings_list.location.replace("--",", ").replace("-"," ")}}, 
+                Dates :{{lodgings_list.checkin}}-{{lodgings_list.checkout}},
+                {{lodgings_list.adults}} adults</p>
+            <p class = "small-text"> Searched at {{lodgings_list.searchTime}}</p>
+        </div>
+    </div>
     <div class="container"> 
+        <form action="">
         <div class="row"> 
-            
-    {% for lodging in lodgings.lodgings %}
-    <div class="col-lg-4 col-md-6 col-12">
-    <div class="card " style="width: 350px;" id="{{lodging.description}}">
+    {% for lodging in lodgings_list.lodgings %}
+
+    <div class="col">
+    <div class="card m-auto" style="width: 300px;" id="{{lodging.description}}">
         <div>
             <img src="{{lodging.img_url}}" class="card-img-top img-fluid" alt="{{lodging.room_type}}">
         </div>
         <div class="card-body">
             <h5 class="card-title">{{lodging.description}}</h5>
-            <p>{{lodging.rating}}</p>
-            <p>{{lodging.room_type}}</p>
-            <p>{{lodging.description}}</p>
-            <p>{{lodging.total_price}}</p>
+            {% if lodging.tags %}
+            <p>
+                {% for tag in lodging.tags %}
+                {% if tag == "cheapest" %}
+                    <span class="badge badge-success">{{tag}}</span>
+                {% elif tag == "best rated" %}
+                    <span class="badge badge-primary">{{tag}}</span>
+                {% elif tag == "most popular" %}
+                    <span class="badge badge-danger">{{tag}}</span>
+                {% else %}
+                    <span class="badge badge-warning">{{tag}}</span>
+                {% endif %}
+                {% endfor %}
+            </p>
+            {% endif %}        
+            <p> <i class="fa fa-star" aria-hidden="true"></i> {{lodging.rating}}/5({{lodging.num_ratings}})</p>
+            <p></p>
+            <p> {{lodging.room_type}}</p>
+            <p>Total Price : {{lodging.total_price}}</p>
+            <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="{{lodging.description}}" name="{{lodging.description}}" class="custom-control-input">
+                <label class="custom-control-label" for="{{lodging.description}}">Select This Option!</label>
+            </div>
             </div>
     </div>
+    </div>
+    
     {% endfor %}
+
     </div>
-        </div>
+        </form>
             </div>
-                
+
+   
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h6 class="display-4">Round Trip Flights</h6>
+                <p>Details: 
+                    origin: {{flights_list.city_origin.replace("--",", ").replace("-"," ")}},
+                    destination: {{flights_list.city_destination.replace("--",", ").replace("-"," ")}},
+                    Dates :{{flights_list.checkin}}-{{flights_list.checkout}},
+                    {{flights_list.adults}} adults</p>
+                <p class = "small-text"> Searched at {{flights_list.searchTime}}</p>
+            </div>
+        </div>
+    {% for flight in flights_list.flights %}
+    <div class="container mt-5 mb-5">
+        <div class="d-flex justify-content-center row">
+            <div class="col-md-6">
+                <div class="card border-0" style="width: 450px;" >
+                    <div class="card-body d-flex flex-column justify-content-between text-white p-0">
+                        <div class="p-4 bg-top">
+                            <div class="d-flex flex-row justify-content-between">
+                                <div class="d-flex flex-column justify-content-between align-items-center">
+                                    <h1>{{flight.origin_flight.airport_origin}}</h1><span class="mb-2">{{flights_list.city_origin}}</span><span>{{flights_list.checkin}}</span><span>{{flight.origin_flight.takeoff_time}}</span>
+                                </div>
+                                <div class="d-flex flex-column justify-content-center">Airline: {{flight.origin_flight.airlines["name"]}} <img src="{{flight.origin_flight.airlines['airline_logo']}} " alt=""></div>
+                                <div class="d-flex flex-column justify-content-between align-items-center">
+                                    <h1>{{flight.origin_flight.airport_destination}}</h1><span class="mb-2">{{flights_list.city_destination}}</span><span>{{flights_list.checkin}}</span><span>{{flight.origin_flight.landing_time}}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row justify-content-between">
+                                <div class="d-flex flex-column justify-content-between align-items-center">
+                                    <h1>{{flight.return_flight.airport_origin}}</h1><span class="mb-2">{{flights_list.city_destination}}</span><span>{{flights_list.checkout}}</span><span>{{flight.return_flight.takeoff_time}}</span>
+                                </div>
+                                <div class="d-flex flex-column justify-content-center">Airline: {{flight.return_flight.airlines["name"]}} <img src="{{flight.return_flight.airlines['airline_logo']}} " alt=""></div>
+                                <div class="d-flex flex-column justify-content-between align-items-center">
+                                    <h1>{{flight.return_flight.airport_destination}}</h1><span class="mb-2">{{flights_list.city_origin}}</span><span>{{flights_list.checkout}}</span><span>{{flight.return_flight.landing_time}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-danger p-4">
+                            <div class="d-flex flex-column justify-content-between">
+                                <div class="d-flex flex-row justify-content-between text-center">
+                                    <div><span class="d-block font-weight-bold">Price</span><span>{{flight.total_price}}</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
 
     </body>
 {% endblock %}
+
+
+
+
+

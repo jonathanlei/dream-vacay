@@ -2,23 +2,24 @@ img {
     height: 60px;
     width: 60px;
 }
-#explore-btn{
+
+.small-text{
+  font-size: 10px;
+}
+
+#explore-btn, h3, .btn-info, .card-title, .btn-link, p{
     font-family: 'Libre Baskerville', serif;
 }
-.btn-link {
-    font-family: 'Libre Baskerville', serif;
-}
-.card-title{
-    font-family: 'Libre Baskerville', serif;
-}
+
 label {
     font-family: 'Libre Baskerville', serif;
     font-size: 14px;
 }
-.btn-info{
-    font-family: 'Libre Baskerville', serif;
-}
 
+
+.jumbotron{
+  background-color: white;
+}
 
 .img-fluid{
     max-width: 100%;
@@ -28,8 +29,10 @@ label {
 .card {
     margin-top: 20px;
     margin-left: 20px;
-    margin-right: 20px
+    margin-right: 20px;
+    margin-bottom: 20px;
 }
+
 #home-page {
   background: url("/static/images/travel-background.jpg") no-repeat center center fixed; 
   -webkit-background-size: cover;
@@ -82,3 +85,6 @@ label {
     background-color: DodgerBlue !important;
     color: #ffffff;
   }
+.bg-top {
+    background: #8E24AA
+}

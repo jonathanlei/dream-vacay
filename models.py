@@ -2,17 +2,56 @@ from datetime import datetime
 
 
 class Lodging():
-    """ single lodging """
-    def __init__(self, img_url, rating, room_type, description, total_price):
+    """ single lodging 
+    example data:
+    <Lodging:
+                      Type: Airbnb
+                      Rating: 4.7
+                      Num of Ratings: 67 reviews
+                      Room: Entire apartment in Houston
+                      Description: 3BR East End Suite 02 | Downtown, Medical Center
+                      total_price: $621> 
+    """
+    def __init__(self,
+                 img_url,
+                 rating,
+                 room_type,
+                 description,
+                 num_ratings,
+                 total_price,
+                 lodging_type):
         self.img_url = img_url
-        self.rating = rating
+        self.rating = float(rating) if rating else None
         self.room_type = room_type
         self.description = description
         self.total_price = total_price
+        if num_ratings:
+            self.num_ratings = int(num_ratings[:num_ratings.index("reviews")])
+        else:
+            self.num_ratings = None
+        self.lodging_type = lodging_type
+        self.tags = []
 
+    def __repr__(self):
+        return f""" <Lodging:
+                      Type: {self.lodging_type}
+                      Rating: {self.rating}
+                      Num of Ratings: {self.num_ratings}
+                      Room: {self.room_type}
+                      Description: {self.description}
+                      total_price: {self.total_price}
+                      tags: {self.tags}> """
+        
     @classmethod
     def fromdict(cls, d):
-        allowed = ("img_url", "rating", "room_type", "description", "total_price")
+        """ construct instance from a dictionary """
+        allowed = ("img_url",
+                   "rating",
+                   "room_type",
+                   "description",
+                   "total_price",
+                   "num_ratings",
+                   "lodging_type")
         df = {k: v for k, v in d.items() if k in allowed}
         return cls(**df)
 
@@ -30,8 +69,18 @@ class Lodgings_List():
     def add_lodging(self, lodging):
         self.lodgings.append(lodging)
 
+    def __repr__(self):
+        return f"""<Lodgings List:
+                    Location : {self.location}
+                    Check in Date: {self.checkin}
+                    Check Out Date: {self.checkout}
+                    Num of Adults: {self.adults}
+                    Search Time: {self.searchTime}
+                    Lodgings: {self.lodgings}>"""
+
     @classmethod
     def fromdict(cls, d):
+        """ construct instance from a dictionary """
         allowed = ("location", "checkin", "checkout", "adults")
         df = {k: v for k, v in d.items() if k in allowed}
         return cls(**df)
@@ -87,8 +136,10 @@ class Flight():
                             Landing time : {self.landing_time}
                             Connections: {self.connections}
                             Duration : {self.duration}>"""
+    
     @classmethod
     def fromdict(cls, d):
+        """ construct instance from a dictionary """
         allowed = (
             "airlines",
             "airport_origin",
@@ -104,11 +155,7 @@ class Flight():
 
   
 class Flights_List():
-    """ list of flights 
-    TODO: Consider changing to city_origin and city_destination becuase each flight
-    already contains info about airports but the Flights_List will be based on a single
-    query from one city to another
-    """
+    """ list of flights - Round Trip only as of right now"""
     def __init__(
                  self,
                  city_origin,
@@ -142,6 +189,7 @@ class Flights_List():
 
     @classmethod
     def fromdict(cls, d):
+        """ construct instance from a dictionary """
         allowed = (
                    "city_origin",
                    "city_destination",

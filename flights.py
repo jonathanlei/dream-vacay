@@ -92,9 +92,6 @@ def get_round_trip_flight_info(flight_ticket_container):
                             statuses=statuses)
 
 
-
-
-
 def get_flights_list_info(search_inputs):
     """ Given a kayak.com flights info url, scrape page and 
     return a list of flight info """
@@ -114,7 +111,7 @@ def get_flights_list_info(search_inputs):
     # Brute forcing a URL here because need to enable JS or else have to use Selenium
     # and you have to provide URL to driver for Selenium
     # Sleeping for randint seconds so Kayak doesn't trigger recapcha
-    sleep(randint(4, 10))
+    sleep(randint(4, 8))
     driver.get(FLIGHTS_INFO_URL)
 
     # Waiting until page fully loads, tags for best / cheapest flights are in right places
@@ -197,7 +194,4 @@ def get_city_codes_from(search_input):
     search_input["destination_airport_code"] = driver.find_element_by_xpath(destination_click_path).text[-4:-1]
 
     driver.quit()
-
-
-
 
