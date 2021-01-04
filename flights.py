@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import re
 from time import sleep
 from random import randint
-from models import Flights_List, Flight
+from models import Flights_List, Flight, RoundTripFlights
 
 # hardcoded search query parameters
 # TODO: update with user data later
@@ -39,11 +39,64 @@ KAYAK_URL = "https://www.kayak.com/flights/"
 FLIGHTS_INFO_URL = f'{KAYAK_URL}/{airport_origin}-{airport_destination}/{outbound_date}/{inbound_date}/{adults}adults'
 
 
-def get_single_flight_info(flight_ticket_container):
+def get_round_trip_flight_info(flight_ticket_container):
     """ Given a flight info container, scrape individual sections and return a flight info instance """
-    flight_info = {}
 
-    breakpoint()
+    def get_single_flight_info(flight_container):
+        flight_info = {}
+        flight_info['airlines'] = {}
+
+        flight_info['airlines']["airline_logo"] = (
+            flight_container.findChild("div", {"class": "leg-carrier"})
+            .findChild("img")['src'])
+
+        flight_info['airlines']["name"] = (
+            flight_container.findChild("div", {"class":"section times"})
+            .findChild("div", {"class":"bottom"})
+            .text.strip())
+        # info string is the arialabel like below
+        # "Depart Leg: American Airlines, SFO 11:28 pm - JFK 3:17 pm. Select to show all results with this leg"
+        info_string = flight_container.findChild("input", {"name":"specleg"})['aria-label']
+        origin_idx = info_string.index(",")
+        flight_info["airport_origin"] = info_string[origin_idx+2:origin_idx+5]
+
+        depart_time_idx = origin_idx+6
+        divider_idx = info_string.index("-")
+        flight_info["takeoff_time"] = info_string[depart_time_idx:divider_idx-1]
+
+        destination_idx = divider_idx+2
+        flight_info["airport_destination"] = info_string[destination_idx:destination_idx+3]
+
+        landing_time_idx = destination_idx+4
+        period_idx = info_string.index(".")
+        flight_info["landing_time"] = info_string[landing_time_idx:period_idx]
+
+        connections = flight_container.findChild("div",{"class": "section stops"}).text.strip().split("\n\n\n")
+        flight_info["connections"] = connections[1:]
+
+        flight_info["duration"] = flight_container.findChild("div", {"class": re.compile("section duration")}).findChild("div", {"class":"top"}).text.strip()
+
+
+        return Flight.fromdict(flight_info)
+
+    total_price = flight_ticket_container.findChild("span", {"class":"price-text"}).text.strip()
+    origin_flight_container = flight_ticket_container.findChild("li", {"class": "flight with-gutter"})
+    return_flight_container = flight_ticket_container.findChildren("li", {"class": "flight"})[-1]
+    origin_flight = get_single_flight_info(origin_flight_container)
+    return_flight = get_single_flight_info(return_flight_container)
+
+    statuses = []
+    cheapest = flight_ticket_container.findChild("div", {"class": "bf-cheapest"})
+    best = flight_ticket_container.findChild("div", {"class": "bf-best"})
+    if cheapest:
+        statuses.append("cheapest")
+    if best:
+        statuses.append("best")
+    return RoundTripFlights(total_price=total_price,
+                            origin_flight=origin_flight,
+                            return_flight=return_flight,
+                            statuses=statuses)
+
 
 
 
@@ -68,13 +121,13 @@ def get_flights_list_info(search_inputs):
     # Waiting until page fully loads, tags for best / cheapest flights are in right places
     # Using the loading indicator for a particular element on site as the bottleneck
     try:
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 1800)
         wait.until_not(
-            EC.text_to_be_present_in_element((By.ID, re.compile("-advice")), "Loading...")
+            EC.text_to_be_present_in_element((By.CLASS_NAME, "col-advice"), "Loading...")
         )
     finally:
         html = driver.page_source
-        driver.quit()
+        # driver.quit()
 
 
     soup = BeautifulSoup(html, features="html.parser")
@@ -83,29 +136,25 @@ def get_flights_list_info(search_inputs):
     flight_ticket_containers = soup.find_all("div", { 
                                 "class": "resultInner"
                                 })
+    
+    def is_quality_flight(flight_container):
+        """ Filter comparator function to check if flight is good. May need to add another 
+        tag for eco-friendly later """
 
+        cheapest = flight_container.findChild("div", {"class": "bf-cheapest"})
+        best = flight_container.findChild("div", {"class": "bf-best"})
+        if cheapest or best:
+            return True
+        return False
+
+    def filter_quality_flights(flight_ticket_containers):
+        """ Takes flight infos based on cheapest, best, and eco-friendly tag """
+
+        return list(filter(is_quality_flight, flight_ticket_containers))
     for ticket_container in filter_quality_flights(flight_ticket_containers):
-        flights_list.add_flight(get_single_flight_info(ticket_container))
+        flights_list.add_flight(get_round_trip_flight_info(ticket_container))
 
     return flights_list
-
-def is_quality_flight(flight_container):
-    """ Filter comparator function to check if flight is good. May need to add another 
-    tag for eco-friendly later """
-
-    cheapest = flight_container.findChild("div", {"class": "bf-cheapest"})
-    best = flight_container.findChild("div", {"class": "bf-best"})
-    if cheapest or best:
-        return True
-    return False
-
-
-def filter_quality_flights(flight_ticket_containers):
-    """ Takes flight infos based on cheapest, best, and eco-friendly tag """
-
-    return list(filter(is_quality_flight, flight_ticket_containers))
-
-
 
         
 

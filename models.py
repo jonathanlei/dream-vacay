@@ -9,7 +9,7 @@ class Lodging():
         self.room_type = room_type
         self.description = description
         self.total_price = total_price
-    
+
     @classmethod
     def fromdict(cls, d):
         allowed = ("img_url", "rating", "room_type", "description", "total_price")
@@ -26,7 +26,7 @@ class Lodgings_List():
         self.adults = adults
         self.searchTime = datetime.utcnow()
         self.lodgings = []
-    
+
     def add_lodging(self, lodging):
         self.lodgings.append(lodging)
 
@@ -41,11 +41,18 @@ class Lodgings_List():
 
 class RoundTripFlights():
     """ Round trip flights"""
-    def __init__(self, total_price, origin_flight, return_flight):
-        self.flights = []
+    def __init__(self, total_price, origin_flight, return_flight, statuses):
         self.total_price = total_price
         self.origin_flight = origin_flight
         self.return_flight = return_flight
+        self.statuses = statuses
+
+    def __repr__(self):
+        return f""" <ROUND TRIP FLIGHT: 
+                    Total Price : {self.total_price}
+                    Origin Flight : {self.origin_flight.__repr__()}
+                    Return Flight : {self.return_flight.__repr__()}
+                    Statuses : {self.statuses}>"""
 
 
 class Flight():
@@ -66,9 +73,20 @@ class Flight():
         self.price = None
         self.takeoff_time = takeoff_time
         self.landing_time = landing_time
-        self.connections = int(connections)
+        # list of connections
+        self.connections = connections
+        self.num_stops = len(connections)
         self.duration = duration
-    
+
+    def __repr__(self):
+        return f"""<Flight : Airline: {self.airlines["name"]}
+                            Origin: {self.airport_origin}
+                            Destination: {self.airport_destination}
+                            Price : {self.price}
+                            Takeoff time : {self.takeoff_time}
+                            Landing time : {self.landing_time}
+                            Connections: {self.connections}
+                            Duration : {self.duration}>"""
     @classmethod
     def fromdict(cls, d):
         allowed = (
@@ -84,7 +102,7 @@ class Flight():
         df = {k: v for k, v in d.items() if k in allowed}
         return cls(**df)
 
-
+  
 class Flights_List():
     """ list of flights """
     def __init__(
