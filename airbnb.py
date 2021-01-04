@@ -6,13 +6,12 @@ from models import Lodgings_List, Lodging
 import itertools
 
 
-test_input = {"location": "Houston--TX--United-States",
-              "checkin": "2021-01-02",
-              "checkout": "2021-01-08",
+test_input = {"city_destination": "Houston--TX--United-States",
+              "checkin": "2021-01-10",
+              "checkout": "2021-01-15",
               "adults": "2"}
 
-AIRBNB_URL = "https://www.airbnb.com/s"
-
+AIRBNB_URL = "https://www.airbnb.com/s/"
 
 def get_single_listing_info(itemlist):
     """ given a bs4 object(listing), get infos about a single listing """
@@ -36,7 +35,6 @@ def get_single_listing_info(itemlist):
         # no rating, add as None
         listing_info["rating"] = None
     # total price
-    breakpoint()
     total_text = div_section.findChildren("button")[-1].text
     total_index = total_text.index("total")
     listing_info["total_price"] = total_text[:total_index-1].replace(u"\xa0", "")
@@ -56,11 +54,11 @@ def get_listings_info(search_input):
     search_input["source"] = "structured_search_input_header"
     search_input["search_type"] = "unknown"
     search_input["tab_id"] = "home_tab"
-
+    search_input["location"] = search_input["city_destination"]
+    search_input.pop("city_destination")
     r = requests.get(url=AIRBNB_URL, params=search_input)
 
     soup = BeautifulSoup(r.content, 'html.parser')
-
     itemlist = soup.find_all(itemprop="itemListElement")
 
     lodgings_list = Lodgings_List.fromdict(search_input)

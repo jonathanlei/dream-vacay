@@ -111,16 +111,16 @@ class Flights_List():
     """
     def __init__(
                  self,
-                 airport_origin,
-                 airport_destination,
-                 outbound_date,
-                 inbound_date,
+                 city_origin,
+                 city_destination,
+                 checkout,
+                 checkin,
                  adults,
                  ):
-        self.airport_origin = airport_origin
-        self.airport_destination = airport_destination
-        self.outbound_date = outbound_date
-        self.inbound_date = inbound_date
+        self.city_origin = city_origin
+        self.city_destination = city_destination
+        self.checkout = checkout
+        self.checkin = checkin
         self.adults = adults
         self.searchTime = datetime.utcnow()
         self.flights = []
@@ -129,10 +129,10 @@ class Flights_List():
         """ Readable representation String for list of RoundTripFlights """
 
         return f""" <Flights List
-            Airport Origin: {self.airport_origin}
-            Airport Destination: {self.airport_destination}
-            Outbound Date: {self.outbound_date}
-            Inbound Date: {self.inbound_date}
+            city Origin: {self.city_origin}
+            city Destination: {self.city_destination}
+            Outbound Date: {self.checkout}
+            Inbound Date: {self.checkin}
             Adults: {self.adults}
             Search Time: {self.searchTime}
             Flights: {self.flights}>"""
@@ -143,10 +143,10 @@ class Flights_List():
     @classmethod
     def fromdict(cls, d):
         allowed = (
-                   "airport_origin",
-                   "airport_destination",
-                   "outbound_date",
-                   "inbound_date",
+                   "city_origin",
+                   "city_destination",
+                   "checkout",
+                   "checkin",
                    "adults",
                    )
         df = {k: v for k, v in d.items() if k in allowed}

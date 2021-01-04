@@ -14,24 +14,15 @@ from time import sleep
 from random import randint
 from models import Flights_List, Flight, RoundTripFlights
 
-# hardcoded search query parameters
-# TODO: update with user data later
-adults = 1
-airport_origin = "SFO"
-airport_destination = "JFK"
-outbound_date = "2021-01-07"  # YYYY-MM-DD
-inbound_date = "2021-01-14"  # YYYY-MM-DD
 
 # Changed airport origin / destination to actual city names to reflect form inputs on explore page
 test_dict = {"adults": 1,
-             "airport_origin": "San Francisco, United States",
-             "airport_destination": "New York City, United States",
-             "outbound_date": "2021-01-07",
-             "inbound_date": "2021-01-14",
-            }   
-            #  "airport_origin_code": None,
-            #  "airport_destination_code": None
-            
+             "city_origin": "San Francisco, United States",
+             "city_destination": "New York City, United States",
+             "checkout": "2021-01-07",
+             "checkin": "2021-01-14"}   
+#  "airport_origin_code": None,
+#  "airport_destination_code": None   
 
 # default params in query string for each search
 QUERY_PARAM_INPUTS = {
@@ -40,9 +31,6 @@ QUERY_PARAM_INPUTS = {
 
 KAYAK_URL = "https://www.kayak.com/flights/"
 
-
-# URL info subject to change based on user input later
-FLIGHTS_INFO_URL = f'{KAYAK_URL}/{airport_origin}-{airport_destination}/{outbound_date}/{inbound_date}/{adults}adults'
 
 
 def get_round_trip_flight_info(flight_ticket_container):
@@ -117,16 +105,17 @@ def get_flights_list_info(search_inputs):
 
     # req = requests.get(url=FLIGHTS_INFO_URL, params=search_inputs)
     # soup = BeautifulSoup(req.content, 'html.parser')
-    FLIGHTS_INFO_URL = f"""{KAYAK_URL}/{search_inputs['origin_airport_code']}-{search_inputs['destination_airport_code']}/
-                           {search_inputs['outbound_date']}/{search_inputs['inbound_date']}/{search_inputs['adults']}adults'"""
+    FLIGHTS_INFO_URL = f"{KAYAK_URL}{search_inputs['origin_airport_code']}-{search_inputs['destination_airport_code']}/{search_inputs['checkin']}/{search_inputs['checkout']}/{search_inputs['adults']}adults'"
     # print(req.content)
-    driver = webdriver.Chrome(executable_path='./chromedriver')
 
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--incognito")
+    driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
     # Brute forcing a URL here because need to enable JS or else have to use Selenium
     # and you have to provide URL to driver for Selenium
     # Sleeping for randint seconds so Kayak doesn't trigger recapcha
-    driver.get(FLIGHTS_INFO_URL)
     sleep(randint(4, 10))
+    driver.get(FLIGHTS_INFO_URL)
 
     # Waiting until page fully loads, tags for best / cheapest flights are in right places
     # Using the loading indicator for a particular element on site as the bottleneck
@@ -166,7 +155,6 @@ def get_flights_list_info(search_inputs):
 
     return flights_list
 
-        
 
 def get_city_codes_from(search_input):
     """ Gets the city codes from user input for cities on explore page  
@@ -174,7 +162,10 @@ def get_city_codes_from(search_input):
     https://medium.com/analytics-vidhya/what-if-selenium-could-do-a-better-job-than-your-travel-agency-5e4e74de08b0
     """
 
-    driver = webdriver.Chrome(executable_path='./chromedriver')
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--incognito")
+
+    driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
 
     # Sleeping for randint seconds so Kayak doesn't trigger recapcha
     driver.get(KAYAK_URL)
@@ -186,8 +177,8 @@ def get_city_codes_from(search_input):
 
     # Origin input box
     origin_text_path = "//input[contains(@id, 'origin-airport')]"
-    driver.find_element_by_xpath(origin_text_path).send_keys(Keys.BACKSPACE + Keys.BACKSPACE + search_input["airport_origin"])
-    sleep(randint(1, 2))
+    driver.find_element_by_xpath(origin_text_path).send_keys(Keys.BACKSPACE + Keys.BACKSPACE + search_input["city_origin"])
+    sleep(randint(2, 4))
     driver.find_element_by_xpath(origin_text_path).send_keys(Keys.RETURN)
 
     sleep(randint(1, 2))
@@ -198,10 +189,10 @@ def get_city_codes_from(search_input):
     
     # Destination input box
     destination_text_path = "//input[contains(@id, 'destination-airport')]"
-    driver.find_element_by_xpath(destination_text_path).send_keys(Keys.BACKSPACE + Keys.BACKSPACE + search_input["airport_destination"])
-    sleep(randint(1, 2))
+    driver.find_element_by_xpath(destination_text_path).send_keys(Keys.BACKSPACE + Keys.BACKSPACE + search_input["city_destination"])
+    sleep(randint(2, 4))
     driver.find_element_by_xpath(destination_text_path).send_keys(Keys.RETURN)
-
+    sleep(1)
     search_input["origin_airport_code"] = driver.find_element_by_xpath(origin_click_path).text[-4:-1]
     search_input["destination_airport_code"] = driver.find_element_by_xpath(destination_click_path).text[-4:-1]
 

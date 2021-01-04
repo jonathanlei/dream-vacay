@@ -9,8 +9,10 @@ class SearchForm(FlaskForm):
 
     origin = StringField("From", validators=[InputRequired(),
                                              Length(min=2, max=30)])
-    checkin = DateField("Check in date", validators=[InputRequired()])
-    checkout = DateField("Check out date", validators=[InputRequired()])
+    checkin = DateField("Check in date", format='yyyy-mm-dd',
+                        validators=[InputRequired()])
+    checkout = DateField("Check out date", format='yyyy-mm-dd',
+                         validators=[InputRequired()])
     adults = IntegerField("Number of guests",
                           validators=[InputRequired(), Length(min=1, max=10)])
 

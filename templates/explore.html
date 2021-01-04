@@ -19,14 +19,16 @@
         </div>
         <div class="card-body">
             <h5 class="card-title">{{place['place'].replace("--",",").replace("-", " ")}}</h5>
-                <form method="POST" autocomplete="off">
+                <form method="POST" autocomplete="off"
+                action= "/trips/s">
                     {{ form.csrf_token }}
                     <div class='input-group'>
-                        <label for="orign">From &nbsp; </label> 
+                        <label for="origin">From &nbsp; </label> 
                         <input class='form-control autocomplete' type='text' name='origin'>
                         <br>
                         <br>
                     </div>
+                    <input type="text" hidden="true" name = "destination" value="{{place['place']}}">
                     {% for field in form
                         if field.widget.input_type != "hidden" and field.name!="origin" %}
 

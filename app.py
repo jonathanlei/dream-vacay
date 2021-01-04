@@ -6,10 +6,27 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 import csv
 from forms import SearchForm
+from airbnb import get_listings_info
+from flights import get_flights_list_info
 
+# 50 most popular travel destinations
+with open('static/csvs/places.csv') as f:
+    PLACES = [{k: v for k, v in row.items()} 
+              for row in csv.DictReader(f, skipinitialspace=True)]
 
+# all world cities over 150,000 people
+with open('static/csvs/worldcities.csv') as f:
+    WORLDCITIES = []
+    for row in csv.DictReader(f, skipinitialspace=True):
+        city_country = ""
+        for k, v in row.items():
+            if k == "name":
+                city_country += v
+            if k == "country":
+                city_country += f", {v}"
+        WORLDCITIES.append(city_country)
 
-CURR_USER_KEY = "curr_user"
+TRIPS_SEARCH_BASE_URL = "/trips/s"
 
 app = Flask(__name__)
 
@@ -44,23 +61,38 @@ def show_home():
 @app.route("/explore")
 def show_explore():
     """ show explore page """
-    # create lists of places dictionary
-    with open('static/csvs/places.csv') as f:
-        places = [{k: v for k, v in row.items()}
-                  for row in csv.DictReader(f, skipinitialspace=True)]
-
-    with open('static/csvs/worldcities.csv') as f:
-        worldcities = []
-        for row in csv.DictReader(f, skipinitialspace=True):
-            city_country = ""
-            for k, v in row.items():
-                if k == "name":
-                    city_country += v
-                if k == "country":
-                    city_country += f", {v}"
-            worldcities.append(city_country)
     form = SearchForm()
     return render_template("explore.html",
-                           places=places,
+                           places=PLACES,
                            form=form,
-                           worldcities=json.dumps(worldcities))
+                           worldcities=json.dumps(WORLDCITIES))
+
+
+@app.route("/trips/s", methods=["POST"])
+def trips_search():
+    """ takes form data, and redirect to search result page """
+    url = construct_search_url(TRIPS_SEARCH_BASE_URL, request.form)
+    return redirect(url)
+
+
+@app.route("/trips/s/<city_origin>/<city_destination>")
+def show_trips_result(city_origin, city_destination):
+    """ run scriping app and display trips results"""
+    search_input = {"city_origin": city_origin,
+                    "city_destination": city_destination,
+                    "adults": request.args.get("adults"),
+                    "checkin": request.args.get("checkin"),
+                    "checkout": request.args.get("checkout")}
+    flights = get_flights_list_info(search_input)
+    lodgings = get_listings_info(search_input)
+    return render_template("results.html", lodgings=lodgings, flights=flights)
+
+
+def construct_search_url(base_url, form):
+    origin = form['origin'].replace(", ", "--").replace(" ", "-")
+    result_url = base_url + f"/{origin}"    
+    result_url += f"/{form['destination']}"
+    result_url += f"?checkin={form['checkin']}"
+    result_url += f"&checkout={form['checkout']}"
+    result_url += f"&adults={form['adults']}"
+    return result_url
