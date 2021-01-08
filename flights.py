@@ -39,10 +39,13 @@ def get_round_trip_flight_info(flight_ticket_container):
     def get_single_flight_info(flight_container):
         flight_info = {}
         flight_info['airlines'] = {}
-
-        flight_info['airlines']["airline_logo"] = (
-            flight_container.findChild("div", {"class": "leg-carrier"})
-            .findChild("img")['src'])
+        try:
+            flight_info['airlines']["airline_logo"] = (
+                flight_container.findChild("div", {"class": "leg-carrier"})
+                .findChild("img")['src'])
+        except:
+            flight_info['airlines']["airline_logo"] = (
+                flight_container.findChild("div", {"class": "section carriers"}).findChild('img')['src'])
 
         flight_info['airlines']["name"] = (
             flight_container.findChild("div", {"class":"section times"})

@@ -1,3 +1,4 @@
+""" TODO: add more field for filtering and search criteria """
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, IntegerField
 from wtforms.fields.html5 import DateField

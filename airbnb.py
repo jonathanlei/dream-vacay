@@ -1,4 +1,6 @@
-""" scraping airbnb result page and return list of dictionaries about result listings"""
+""" scraping airbnb result page and return list of dictionaries about result listings
+TODO: scrape individual pages for details if user clicks
+TODO : seperate scraping that could change and never changes"""
 import requests
 from bs4 import BeautifulSoup
 import re
