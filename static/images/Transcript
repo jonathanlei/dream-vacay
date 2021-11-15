@@ -1,0 +1,182 @@
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+    <!-- X-UA-Compatible meta tag must be the first meta tag in order to be effective in telling IE that compatibility view shouldn't be used on this site. -->
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Language" content="en" />
+    <script type="text/javascript" src="DGW_objKeyEventHandler.js"></script>
+    <script type="text/javascript" src="BrowserSniffer.js"></script>
+    <noscript>JavaScript is Required!</noscript>
+    <title>Ellucian Degree Works - Mason Degree Works
+</title>
+    <script src="BrowserSniffer.js"></script>
+    <noscript>JavaScript is Required!</noscript>
+    <script src="DGW_Functions.js"></script>
+    <noscript>JavaScript is Required!</noscript>
+    <script src="ToolTip.js"></script>
+    <noscript>JavaScript is Required!</noscript>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Language" content="en" />
+    <link rel="stylesheet" href="DGW_Style.css" type="text/css">
+</head>
+<script language="JavaScript">
+    var sDefaultMethod = "POST";
+</script>
+<noscript>JavaScript is Required!</noscript>
+
+<script language="JavaScript">
+// isDashboardWindow enables error.js to identify the dashboard window for redirect
+var isDashboardWindow = true;
+
+if (top.frames.length != 0)
+{
+   top.location=self.document.location;
+}
+</script>
+
+<script type="text/javascript" src="SupportedBrowserCheck.js"></script>
+<noscript>JavaScript is Required!</noscript>
+<script type="text/javascript" src="DGW_objKeyEventGlobal.js"></script>
+<noscript>JavaScript is Required!</noscript>
+<script language="JavaScript" src="DGW_ReloadMain.js"></script>
+<noscript>JavaScript is Required!</noscript>
+<script src="jquery.min.js"></script>
+
+<script language="JavaScript">
+
+//Set cgi and delpass parameters for log out.
+var sCgiPath = "dashboard";
+var sDelPassParameters = { SERVICE : "DELPASS", SCRIPT : "SD2LOGOUT" };
+
+//Register an event handler that will call DoLogout when window is closed.
+$(document).ready(function()
+{
+   $(window).bind("beforeunload", function()
+   {
+      if (frHeader.bLogoutRequestSent)
+      {
+         return;
+      }
+      frHeader.DoLogout(false);
+   });
+});
+
+var sCopyright = "1995 - 2016"
+var bWebAccess = true;
+var bExpMgtAccess = false;
+var bChangePasswordAccess = false;
+var bInstantRapport = false;
+var bCasLogoutEnabled = false;
+var bSepTemplateAccess = false;
+var bEnableExternalLogout = false;
+
+
+
+
+
+
+
+var sSepBaseUrl = "https://irisp.gmu.edu:8444/DGWP-StudentPlanner";
+var sTransferFinderBaseUrl = "";
+
+//If there is a slash on sSepBaseUrl, remove it
+if (sSepBaseUrl.length > 0)
+{
+   if (endsWith(sSepBaseUrl, "/"))
+   {
+      sSepBaseUrl = sSepBaseUrl.substr(0, sSepBaseUrl.length - 1);
+   }
+}
+
+var sSepRedirectUrl = sSepBaseUrl;
+var sSepTemplateUrl = "/template/template-management.zul";
+
+function redirectToAppServer(sRedirectBaseUrl, sDestinationUrl, sTarget)
+{
+   postToUrl(sRedirectBaseUrl + sDestinationUrl, {passport: "9WIMCB9OTYVR6Q9P9BIGN1GM2A"}, sTarget);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// You can pass in an sMode to be used here to control where the link
+// should go within Self-Service.
+//////////////////////////////////////////////////////////////////////////////
+function BackToSelfServiceBanner(sMode)
+{
+// assume user is not a student (or not logged on as one anyway)
+var bStudent = false;
+bStudent = true; // this is a student
+
+if (bStudent)
+  {
+  if (sMode=="Transcript")
+    sMenuName="bwskotrn.P_ViewTermTran";
+  else // normal mode
+    sMenuName="twbkwbis.P_GenMenu?name=bmenu.P_StuCapMnu";
+  }
+else // not a student
+  {
+  if (sMode=="Transcript")
+    sMenuName="bwlkftrn.P_FacDispTran";
+  else // normal mode
+    sMenuName="twbkwbis.P_GenMenu?name=bmenu.P_AdvCapMnu";
+  }
+
+// Modify per Ellucian, security issue when user not logging out 20191212
+// AL mod - add call to logout internal URL to perform DW logout
+$.ajax(
+{
+     async: false,
+     url: "logout"
+});
+// end mod
+
+window.location.href = "https://patriotweb.gmu.edu/pls/prod/" + sMenuName;
+} // backtoselfservicebanner
+//////////////////////////////////////////////////////////////////////////////
+function LoadScripts()
+{
+if (! bWebAccess)   // User is not allowed any web access
+  {
+  alert ("You have not been given permission to use this application.");
+  window.close();
+  }
+
+    frBodyContainer.document.frmLoadFrame.action = "dashboard";
+    frBodyContainer.document.frmLoadFrame.method = sDefaultMethod;
+    frBodyContainer.document.frmLoadFrame.target = "frBodyContainer";
+    frBodyContainer.document.frmLoadFrame.SCRIPT.value = "SD2WORKSBODYFRAMES";
+    frBodyContainer.document.frmLoadFrame.submit();
+
+    frControl.document.frmLoadFrame.action = "dashboard";
+    frControl.document.frmLoadFrame.method = sDefaultMethod;
+    frControl.document.frmLoadFrame.target = "frControl";
+    frControl.document.frmLoadFrame.SCRIPT.value = "SD2STUCON";
+    frControl.document.frmLoadFrame.submit();
+
+    frTabs.document.frmLoadFrame.action = "dashboard";
+    frTabs.document.frmLoadFrame.method = sDefaultMethod;
+    frTabs.document.frmLoadFrame.target = "frTabs";
+    frTabs.document.frmLoadFrame.SCRIPT.value = "SD2GENTAB";
+    frTabs.document.frmLoadFrame.submit();
+
+}
+
+</script>
+<noscript>JavaScript is Required!</noscript>
+<form name="frmParent">
+</form>
+<frameset rows="079,50,25,*,30,0"
+   border="0" framespacing="0" frameborder="no" onLoad="LoadScripts();">
+   <frame src="SD_HeaderFrame.html" name="frHeader" noresize="true" marginheight="0" marginwidth="0" scrolling="no" title="Header" />
+   <frame src="SD_LoadFrameForm.html" name="frControl" noresize="true" marginheight="0" marginwidth="0" scrolling="no" title="Control" />
+   <frame src="SD_LoadFrameForm.html" name="frTabs" noresize="true" marginheight="0" marginwidth="0" scrolling="no" title="Student Context Information" />
+   <frame src="SD_LoadFrameForm.html" name="frBodyContainer" noresize="true" marginheight="0" marginwidth="0" scrolling="no" />
+   <frame src="SD_MainFooter.html" name="frFooter" noresize="true" marginheight="0" marginwidth="0" scrolling="no" title="Copyright Information." />
+   <frameset cols="50%,*" border="1" framespacing="0" frameborder="yes" name="frHoldSet">
+      <frame src="SD_MainBackground.html" name="frHold"  marginheight="0" marginwidth="0" scrolling="auto" />
+      <frame src="SD_MainBackground.html" name="frHold2" marginheight="0"  marginwidth="0" scrolling="auto" />
+   </frameset>
+   <noframes>Frames support is required!</noframes>
+</frameset>
+<noframes>Frames support is required!</noframes>
+</html>

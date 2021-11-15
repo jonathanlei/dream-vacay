@@ -40,7 +40,8 @@ def get_single_listing_info(itemlist):
         listing_info["rating"] = None
         listing_info["num_ratings"] = 0
     # total price
-    total_text = div_section.findChildren("button")[-1].text
+    total_text_button = div_section.findChildren("button")[-1].text
+    total_text =  total_text_button if total_text_button else div_section.findChildren("span")[-1].text
     total_index = total_text.index("total")
     listing_info["total_price"] = total_text[:total_index-1].replace(u"\xa0", "")
 
@@ -62,16 +63,16 @@ def get_listings_info(search_input):
     search_input["search_type"] = "unknown"
     search_input["tab_id"] = "home_tab"
     search_input["location"] = search_input["city_destination"]
-    search_input.pop("city_destination")
+    # search_input.pop("city_destination")
 
     r = requests.get(url=AIRBNB_URL, params=search_input)
     soup = BeautifulSoup(r.content, 'html.parser')
     itemlist = soup.find_all(itemprop="itemListElement")
+    breakpoint()
 
     lodgings_list = Lodgings_List.fromdict(search_input)
-    
+
     for listing in itemlist:
         lodgings_list.add_lodging(get_single_listing_info(listing))
-    
     lodgings_list.lodgings = sort_and_filter_lodgings(lodgings_list.lodgings)
     return lodgings_list

@@ -3,62 +3,6 @@
 
 {% block content%}
 <body>
-    <div class="jumbotron jumbotron-fluid">
-        <div class="container">
-            <h6 class="display-4">Lodgings</h6>
-            <p>Details: {{lodgings_list.location.replace("--",", ").replace("-"," ")}}, 
-                Dates :{{lodgings_list.checkin}}-{{lodgings_list.checkout}},
-                {{lodgings_list.adults}} adults</p>
-            <p class = "small-text"> Searched at {{lodgings_list.searchTime}}</p>
-        </div>
-    </div>
-    <div class="container"> 
-        <form action="">
-        <div class="row"> 
-    {% for lodging in lodgings_list.lodgings %}
-
-    <div class="col">
-    <div class="card m-auto" style="width: 300px;" id="{{lodging.description}}">
-        <div>
-            <img src="{{lodging.img_url}}" class="card-img-top img-fluid" alt="{{lodging.room_type}}">
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">{{lodging.description}}</h5>
-            {% if lodging.tags %}
-            <p>
-                {% for tag in lodging.tags %}
-                {% if tag == "cheapest" %}
-                    <span class="badge badge-success">{{tag}}</span>
-                {% elif tag == "best rated" %}
-                    <span class="badge badge-primary">{{tag}}</span>
-                {% elif tag == "most popular" %}
-                    <span class="badge badge-danger">{{tag}}</span>
-                {% else %}
-                    <span class="badge badge-warning">{{tag}}</span>
-                {% endif %}
-                {% endfor %}
-            </p>
-            {% endif %}
-            {% if lodging.rating%}     
-            <p> <i class="fa fa-star" aria-hidden="true"></i> {{lodging.rating}}/5({{lodging.num_ratings}})</p>
-            {% endif %}
-            <p> {{lodging.room_type}}</p>
-            <p>Total Price : {{lodging.total_price}}</p>
-            <div class="custom-control custom-radio custom-control-inline">
-                <input type="radio" id="{{lodging.description}}" name="{{lodging.description}}" class="custom-control-input">
-                <label class="custom-control-label" for="{{lodging.description}}">Select This Option!</label>
-            </div>
-            </div>
-    </div>
-    </div>
-    
-    {% endfor %}
-
-    </div>
-        </form>
-            </div>
-
-   
         <div class="jumbotron jumbotron-fluid">
             <div class="container">
                 <h6 class="display-4">Round Trip Flights</h6>

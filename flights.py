@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 
 import re
 from time import sleep
@@ -20,17 +21,16 @@ test_dict = {"adults": 1,
              "city_origin": "San Francisco, United States",
              "city_destination": "New York City, United States",
              "checkout": "2021-01-07",
-             "checkin": "2021-01-14"}   
+             "checkin": "2021-01-14"}
 #  "airport_origin_code": None,
-#  "airport_destination_code": None   
+#  "airport_destination_code": None
 
 # default params in query string for each search
 QUERY_PARAM_INPUTS = {
-   "sort": "bestflight_a"
+    "sort": "bestflight_a"
 }
 
 KAYAK_URL = "https://www.kayak.com/flights/"
-
 
 
 def get_round_trip_flight_info(flight_ticket_container):
@@ -48,12 +48,13 @@ def get_round_trip_flight_info(flight_ticket_container):
                 flight_container.findChild("div", {"class": "section carriers"}).findChild('img')['src'])
 
         flight_info['airlines']["name"] = (
-            flight_container.findChild("div", {"class":"section times"})
-            .findChild("div", {"class":"bottom"})
+            flight_container.findChild("div", {"class": "section times"})
+            .findChild("div", {"class": "bottom"})
             .text.strip())
         # info string is the arialabel like below
         # "Depart Leg: American Airlines, SFO 11:28 pm - JFK 3:17 pm. Select to show all results with this leg"
-        info_string = flight_container.findChild("input", {"name":"specleg"})['aria-label']
+        info_string = flight_container.findChild(
+            "input", {"name": "specleg"})['aria-label']
         origin_idx = info_string.index(",")
         flight_info["airport_origin"] = info_string[origin_idx+2:origin_idx+5]
 
@@ -68,22 +69,27 @@ def get_round_trip_flight_info(flight_ticket_container):
         period_idx = info_string.index(".")
         flight_info["landing_time"] = info_string[landing_time_idx:period_idx]
 
-        connections = flight_container.findChild("div",{"class": "section stops"}).text.strip().split("\n\n\n")
+        connections = flight_container.findChild(
+            "div", {"class": "section stops"}).text.strip().split("\n\n\n")
         flight_info["connections"] = connections[1:]
 
-        flight_info["duration"] = flight_container.findChild("div", {"class": re.compile("section duration")}).findChild("div", {"class":"top"}).text.strip()
-
+        flight_info["duration"] = flight_container.findChild("div", {"class": re.compile(
+            "section duration")}).findChild("div", {"class": "top"}).text.strip()
 
         return Flight.fromdict(flight_info)
 
-    total_price = flight_ticket_container.findChild("span", {"class":"price-text"}).text.strip()
-    origin_flight_container = flight_ticket_container.findChild("li", {"class": "flight with-gutter"})
-    return_flight_container = flight_ticket_container.findChildren("li", {"class": "flight"})[-1]
+    total_price = flight_ticket_container.findChild(
+        "span", {"class": "price-text"}).text.strip()
+    origin_flight_container = flight_ticket_container.findChild(
+        "li", {"class": "flight with-gutter"})
+    return_flight_container = flight_ticket_container.findChildren(
+        "li", {"class": "flight"})[-1]
     origin_flight = get_single_flight_info(origin_flight_container)
     return_flight = get_single_flight_info(return_flight_container)
 
     statuses = []
-    cheapest = flight_ticket_container.findChild("div", {"class": "bf-cheapest"})
+    cheapest = flight_ticket_container.findChild(
+        "div", {"class": "bf-cheapest"})
     best = flight_ticket_container.findChild("div", {"class": "bf-best"})
     if cheapest:
         statuses.append("cheapest")
@@ -110,7 +116,8 @@ def get_flights_list_info(search_inputs):
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--incognito")
-    driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
+    driver = webdriver.Chrome(
+        executable_path='./chromedriver', chrome_options=chrome_options)
     # Brute forcing a URL here because need to enable JS or else have to use Selenium
     # and you have to provide URL to driver for Selenium
     # Sleeping for randint seconds so Kayak doesn't trigger recapcha
@@ -122,7 +129,8 @@ def get_flights_list_info(search_inputs):
     try:
         wait = WebDriverWait(driver, 1800)
         wait.until_not(
-            EC.text_to_be_present_in_element((By.CLASS_NAME, "col-advice"), "Loading...")
+            EC.text_to_be_present_in_element(
+                (By.CLASS_NAME, "col-advice"), "Loading...")
         )
     finally:
         html = driver.page_source
@@ -131,10 +139,10 @@ def get_flights_list_info(search_inputs):
     soup = BeautifulSoup(html, features="html.parser")
 
     flights_list = Flights_List.fromdict(search_inputs)
-    flight_ticket_containers = soup.find_all("div", { 
-                                "class": "resultInner"
-                                })
-    
+    flight_ticket_containers = soup.find_all("div", {
+        "class": "resultInner"
+    })
+
     def is_quality_flight(flight_container):
         """ Filter comparator function to check if flight is good. May need to add another 
         tag for eco-friendly later """
@@ -162,39 +170,60 @@ def get_city_codes_from(search_input):
     https://medium.com/analytics-vidhya/what-if-selenium-could-do-a-better-job-than-your-travel-agency-5e4e74de08b0
     """
 
+
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--incognito")
 
-    driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
+    driver = webdriver.Chrome(
+        executable_path='./chromedriver', chrome_options=chrome_options)
 
     # Sleeping for randint seconds so Kayak doesn't trigger recapcha
     driver.get(KAYAK_URL)
     sleep(randint(2, 5))
 
+    # Close cookies pop-up
+    accept_cookies_xpath = '/html/body/div[12]/div/div[3]/div/div/div/div/div[1]/div/div[2]/div[2]/div[1]/button/span'
+
+    try:
+        driver.find_element_by_xpath(accept_cookies_xpath).click()
+    except NoSuchElementException:
+        pass
+
     # Origin click path
-    origin_click_path = "//*[contains(@id, 'origin-airport-display')]"
+    origin_click_path = "//*[contains(@aria-label, 'Flight origin input')]"
+
     driver.find_element_by_xpath(origin_click_path).click()
 
+
+
     # Origin input box
-    origin_text_path = "//input[contains(@id, 'origin-airport')]"
-    driver.find_element_by_xpath(origin_text_path).send_keys(Keys.BACKSPACE + Keys.BACKSPACE + search_input["city_origin"])
+    origin_text_path = "//input[contains(@class, 'k_my-input')]"
+    sleep(randint(1, 2))
+    # #get rid of default tag 
+    # default_tag_path = "//*[contains(@class,'vvTc-item-button')]"
+    # driver.find_element_by_xpath(default_tag_path).click()
+    driver.find_element_by_xpath(origin_text_path).send_keys(search_input["city_origin"])
     sleep(randint(2, 4))
     driver.find_element_by_xpath(origin_text_path).send_keys(Keys.RETURN)
 
     sleep(randint(1, 2))
 
     # Destination click path
-    destination_click_path = "//*[contains(@id, 'destination-airport-display')]"
+    destination_click_path = "//*[contains(@aria-label, 'Flight destination input')]"
     driver.find_element_by_xpath(destination_click_path).click()
-    
+
     # Destination input box
-    destination_text_path = "//input[contains(@id, 'destination-airport')]"
-    driver.find_element_by_xpath(destination_text_path).send_keys(Keys.BACKSPACE + Keys.BACKSPACE + search_input["city_destination"])
+    destination_text_path = "//input[contains(@class, 'k_my-input')]"
+    sleep(randint(1, 2))
+    driver.find_element_by_xpath(destination_text_path).send_keys(search_input["city_destination"])
     sleep(randint(2, 4))
-    driver.find_element_by_xpath(destination_text_path).send_keys(Keys.RETURN)
+    driver.find_element_by_xpath(
+        destination_text_path).send_keys(Keys.RETURN)
     sleep(1)
-    search_input["origin_airport_code"] = driver.find_element_by_xpath(origin_click_path).text[-4:-1]
-    search_input["destination_airport_code"] = driver.find_element_by_xpath(destination_click_path).text[-4:-1]
+    print(driver.find_element_by_xpath(origin_click_path).text)
+    search_input["origin_airport_code"] = driver.find_element_by_xpath(
+        origin_click_path).text[-4:]
+    search_input["destination_airport_code"] = driver.find_element_by_xpath(
+        destination_click_path).text[-4:-1]
 
     driver.quit()
-

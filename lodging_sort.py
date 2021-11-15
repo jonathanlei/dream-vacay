@@ -5,6 +5,8 @@ def sort_and_filter_lodgings(lodgings_list):
     """ sort the lodgings by total price and ratings
     return the cheapest and best rated (with most reviews)"""
     # add top result
+    if len(lodgings_list) == 0: 
+        return None
     lodgings_list[0].tags.append("top result")
     final_recommendation_set = {lodgings_list[0]}
     # filter list with ratings
